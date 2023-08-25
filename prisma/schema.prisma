@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id              String @id @map("_id") @default(uuid())
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
   name            String?
   email           String?   @unique
   emailVerified   DateTime?
@@ -19,7 +19,7 @@ model User {
   hashedPassword  String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  favoriteIds     String[] 
+  favoriteIds     String[] @db.ObjectId
 
   accounts Account[]
   listings Listing[]
@@ -27,17 +27,17 @@ model User {
 }
 
 model Account {
-  id String @id @default(uuid()) @map("_id")
-  userId             String   @default(uuid())
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String   @db.ObjectId
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?  @default(uuid())
-  access_token       String?  @default(uuid())
+  refresh_token      String?  @db.String
+  access_token       String?  @db.String
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?  @default(uuid())
+  id_token           String?  @db.String
   session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -46,7 +46,7 @@ model Account {
 }
 
 model Listing {
-  id             String @id @default(uuid()) @map("_id")
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
   title String
   description String
   imageSrc String
@@ -56,7 +56,7 @@ model Listing {
   bathroomCount Int
   guestCount Int
   locationValue String
-  userId String @default(uuid())
+  userId String @db.ObjectId
   price Int
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -64,9 +64,9 @@ model Listing {
 }
 
 model Reservation {
-  id String @id @default(uuid()) @map("_id")
-  userId String @default(uuid())
-  listingId String @default(uuid()) 
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  listingId String @db.ObjectId  
   startDate DateTime
   endDate DateTime
   totalPrice Int
